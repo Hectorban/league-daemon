@@ -12,6 +12,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use url::Url;
 use reqwest::{header, Certificate};
+use chrono::Utc;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TeamElement {
@@ -80,7 +81,7 @@ async fn main() -> Result<()> {
             let model: Value = serde_json::from_str(&data).unwrap();
             let inner_data = &model[2]["data"].to_string();
             let champ_select: Value = serde_json::from_str(&inner_data).unwrap();
-            let champ_select_ternifolia_url = Url::parse("http://localhost:9090/university/champselect").unwrap();
+            let champ_select_ternifolia_url = Url::parse("https://ternifolia.com/university/champselect").unwrap();
             client.post(champ_select_ternifolia_url)
                   .json(&champ_select)
                   .send()
@@ -107,11 +108,12 @@ async fn main() -> Result<()> {
                 summ_id_transform.insert(player.summoner_id.to_string(), res["displayName"].to_string());
             }
 
-            let summ_names_ternifolia_url = Url::parse("http://localhost:9090/university/summonernames").unwrap();
+            let summ_names_ternifolia_url = Url::parse("https://ternifolia.com/university/summonernames").unwrap();
             client.post(summ_names_ternifolia_url)
                   .json(&summ_id_transform)
                   .send()
                   .await.unwrap();
+            println!("Sending request to ternifolia at {}", Utc::now());
         }
     });
 
